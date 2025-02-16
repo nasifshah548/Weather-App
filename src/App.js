@@ -7,7 +7,7 @@ const WeatherApp = () => {
   const [weatherData, setWeatherData] = useState(null); // Stores weather data
   const [error, setError] = useState(null); // Stores error messages
   const [isSubmitted, setIsSubmitted] = useState(false); // Tracks search submission
-
+ 
   // Update inputCity as user types (does not trigger search)
   const handleCityChange = (event) => {
     const newCity = event.target.value;
@@ -90,8 +90,8 @@ const WeatherApp = () => {
             {weatherData.name}, {weatherData.sys.country}
           </h2>
           <p>
-            Temperature: {weatherData.main.temp}°C |{" "}
-            {Fahrenheit(weatherData.main.temp).toFixed(1)}°F
+            Temperature: {Math.round(weatherData.main.temp)}°C |{" "}
+            {Math.round(Fahrenheit(weatherData.main.temp))}°F
           </p>
           <p>
             Weather:{" "}
