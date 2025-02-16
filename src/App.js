@@ -24,13 +24,13 @@ const WeatherApp = () => {
   // Handle search button click or Enter key press
   const handleSearch = () => {
     if (inputCity.trim() === "") {
-      // Reset everything if search bar is empty
+      setError("Please enter a city name.");
       setCity("");
       setWeatherData(null);
-      setError(null);
       setIsSubmitted(false);
     } else {
       setCity(inputCity); // Update city for search
+      setError(null); // Reset any previous errors
       setIsSubmitted(true); // Trigger search
     }
   };
@@ -51,25 +51,37 @@ const WeatherApp = () => {
           const response = await axios.get(
             `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=e312dbeb8840e51f92334498a261ca1d`
           );
+          
           if (isMounted) {
-            setWeatherData(response.data);
-            setError(null); // Clear errors on success
+            if (response.status === 200) {
+              setWeatherData(response.data);
+              setError(null); // Clear errors on success
+            } else {
+              setError("City not found. Please try another city.");
+              setWeatherData(null);
+            }
           }
         } catch (error) {
           if (isMounted) {
-            setError("Sorry! That city or town does not exist.");
+            if (error.response && error.response.status === 404) {
+              setError("City not found. Please try another city.");
+            } else {
+              setError("An error occurred while fetching the weather data.");
+            }
             setWeatherData(null);
           }
         } finally {
-          if (isMounted) setIsSubmitted(false); // Reset submission flag
+          if (isMounted) {
+            setIsSubmitted(false); // Reset submission flag
+          }
         }
       };
-  
+
       fetchWeatherData();
     }
-  
+
     return () => {
-      isMounted = false;
+      isMounted = false; // Clean up flag to prevent state updates if unmounted
     };
   }, [isSubmitted, city]);  // Only fetch when city updates
 
@@ -95,8 +107,10 @@ const WeatherApp = () => {
       {/* Show error only if search was submitted and city is invalid */}
       {error && <p style={{ color: "red" }}>{error}</p>}
 
+      {/* Show loading message if data is being fetched */}
       {isSubmitted && !error && !weatherData && <p>Fetching weather data, please wait...</p>}
 
+      {/* Display weather data */}
       {weatherData ? (
         <div>
           <h2>
@@ -116,7 +130,7 @@ const WeatherApp = () => {
           </p>
         </div>
       ) : (
-        isSubmitted && !error && city.trim() !== "" && <p>Loading...</p>
+        !isSubmitted && !error && <p>Enter a city to get the weather.</p>
       )}
     </div>
   );
