@@ -44,26 +44,34 @@ const WeatherApp = () => {
 
   // Fetch weather when `isSubmitted` changes
   useEffect(() => {
+    let isMounted = true; // flag to track if the component is still mounted
     if (isSubmitted && city.trim() !== "") {
       const fetchWeatherData = async () => {
         try {
           const response = await axios.get(
             `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=e312dbeb8840e51f92334498a261ca1d`
           );
-          setWeatherData(response.data);
-          setError(null); // Clear errors on success
+          if (isMounted) {
+            setWeatherData(response.data);
+            setError(null); // Clear errors on success
+          }
         } catch (error) {
-          console.error("Error fetching the weather data: ", error);
-          setError("Sorry! That city or town does not exist.");
-          setWeatherData(null);
+          if (isMounted) {
+            setError("Sorry! That city or town does not exist.");
+            setWeatherData(null);
+          }
         } finally {
-          setIsSubmitted(false); // Reset submission flag
+          if (isMounted) setIsSubmitted(false); // Reset submission flag
         }
       };
-
+  
       fetchWeatherData();
     }
-  }, [isSubmitted, city]); // Only fetch when city updates
+  
+    return () => {
+      isMounted = false;
+    };
+  }, [isSubmitted, city]);  // Only fetch when city updates
 
   // Converting Celsius to Fahrenheit
   const Fahrenheit = (celsius) => (celsius * 9) / 5 + 32;
@@ -78,11 +86,16 @@ const WeatherApp = () => {
         onChange={handleCityChange} // Update input field only
         onKeyPress={handleKeyPress} // Trigger search on Enter key press
         placeholder="Enter city name"
+        aria-label="Search for city weather"
       />
-      <button onClick={handleSearch}>Search</button>
+      <button onClick={handleSearch} aria-label="Search weather">
+        Search
+      </button>
 
       {/* Show error only if search was submitted and city is invalid */}
       {error && <p style={{ color: "red" }}>{error}</p>}
+
+      {isSubmitted && !error && !weatherData && <p>Fetching weather data, please wait...</p>}
 
       {weatherData ? (
         <div>
@@ -96,7 +109,7 @@ const WeatherApp = () => {
           <p>
             Weather:{" "}
             <img
-              src={`http://openweathermap.org/img/w/${weatherData.weather[0].icon}.png`}
+              src={`https://openweathermap.org/img/w/${weatherData.weather[0].icon}.png`}
               alt="weather-icon"
             />{" "}
             {weatherData.weather[0].description}
