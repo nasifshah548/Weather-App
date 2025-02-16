@@ -97,7 +97,7 @@ const WeatherApp = () => {
         value={inputCity}
         onChange={handleCityChange} // Update input field only
         onKeyPress={handleKeyPress} // Trigger search on Enter key press
-        placeholder="Enter city name"
+        placeholder="Please enter a city name"
         aria-label="Search for city weather"
       />
       <button onClick={handleSearch} aria-label="Search weather">
@@ -130,7 +130,7 @@ const WeatherApp = () => {
           </p>
         </div>
       ) : (
-        !isSubmitted && !error && <p>Enter a city to get the weather.</p>
+        !isSubmitted && !error && <p></p>
       )}
     </div>
   );
