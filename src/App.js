@@ -2,11 +2,11 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 // Reusable component to display temperature in Celsius and Fahrenheit
-const TemperatureDisplay = ({ label, temp }) => {
-  const Fahrenheit = (celsius) => (celsius * 9) / 5 + 32;
+const TemperatureDisplay = (props) => {
+  const fahrenheit = (celsius) => (celsius * 9) / 5 + 32; // Converting celcius to farenheit
   return (
     <p>
-      {label}: {Math.round(temp)}°C | {Math.round(Fahrenheit(temp))}°F
+      {props.label}: {Math.round(props.temp)}°C | {Math.round(fahrenheit(props.temp))}°F
     </p>
   );
 };
