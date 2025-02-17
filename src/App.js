@@ -121,6 +121,10 @@ const WeatherApp = () => {
             {Math.round(Fahrenheit(weatherData.main.temp))}°F
           </p>
           <p>
+            Feels Like: {Math.round(weatherData.main.feels_like)}°C |{" "}
+            {Math.round(Fahrenheit(weatherData.main.feels_like))}°F
+          </p>
+          <p>
             Weather:{" "}
             <img
               src={`https://openweathermap.org/img/w/${weatherData.weather[0].icon}.png`}
