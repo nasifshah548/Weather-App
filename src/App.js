@@ -1,13 +1,23 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
+// Reusable component to display temperature in Celsius and Fahrenheit
+const TemperatureDisplay = ({ label, temp }) => {
+  const Fahrenheit = (celsius) => (celsius * 9) / 5 + 32;
+  return (
+    <p>
+      {label}: {Math.round(temp)}°C | {Math.round(Fahrenheit(temp))}°F
+    </p>
+  );
+};
+
 const WeatherApp = () => {
   const [inputCity, setInputCity] = useState(""); // Stores user input
   const [city, setCity] = useState(""); // Stores the actual searched city
   const [weatherData, setWeatherData] = useState(null); // Stores weather data
   const [error, setError] = useState(null); // Stores error messages
   const [isSubmitted, setIsSubmitted] = useState(false); // Tracks search submission
- 
+
   // Update inputCity as user types (does not trigger search)
   const handleCityChange = (event) => {
     const newCity = event.target.value;
@@ -51,7 +61,7 @@ const WeatherApp = () => {
           const response = await axios.get(
             `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=e312dbeb8840e51f92334498a261ca1d`
           );
-          
+
           if (isMounted) {
             if (response.status === 200) {
               setWeatherData(response.data);
@@ -83,10 +93,7 @@ const WeatherApp = () => {
     return () => {
       isMounted = false; // Clean up flag to prevent state updates if unmounted
     };
-  }, [isSubmitted, city]);  // Only fetch when city updates
-
-  // Converting Celsius to Fahrenheit
-  const Fahrenheit = (celsius) => (celsius * 9) / 5 + 32;
+  }, [isSubmitted, city]); // Only fetch when city updates
 
   return (
     <div>
@@ -116,14 +123,11 @@ const WeatherApp = () => {
           <h2>
             {weatherData.name}, {weatherData.sys.country}
           </h2>
-          <p>
-            Temperature: {Math.round(weatherData.main.temp)}°C |{" "}
-            {Math.round(Fahrenheit(weatherData.main.temp))}°F
-          </p>
-          <p>
-            Feels Like: {Math.round(weatherData.main.feels_like)}°C |{" "}
-            {Math.round(Fahrenheit(weatherData.main.feels_like))}°F
-          </p>
+
+          {/* Using reusable component for temperature display */}
+          <TemperatureDisplay label="Temperature" temp={weatherData.main.temp} />
+          <TemperatureDisplay label="Feels Like" temp={weatherData.main.feels_like} />
+
           <p>
             Weather:{" "}
             <img
